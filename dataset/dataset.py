@@ -222,32 +222,158 @@ class PromptDataset(data.Dataset):
         if self.k_shots > 0:
             fs_txt = f'{dataset_name}_{seed}seed_{str(self.k_shots)}shot_{mode}_prompts.txt'
             prompt_save_dir = os.path.join(save_dir, fs_txt)
-            if len(self.view_list) > 1:
+
+            # ==========================================================
+            # MVTec: 使用统一固定的 nested few-shot split
+            # PatchCore / AdaptCLIP 共用完全相同的训练图片
+            # ==========================================================
+            if dataset_name == 'mvtec':
+
+                split_file = "/root/autodl-tmp/AdaptCLIP/MVTec_fewshot_split_seed2026.json"
+
+                if not os.path.exists(split_file):
+                    raise FileNotFoundError(
+                        f"Few-shot split file not found: {split_file}"
+                    )
+
+                with open(split_file, "r") as f:
+                    fewshot_split = json.load(f)
+
+                shot_key = str(self.k_shots)
+
+                # 清空本次实验的 prompt 记录文件，防止重复追加
+                os.makedirs(save_dir, exist_ok=True)
+                with open(prompt_save_dir, "w") as f:
+                    pass
+
+                for cls_name in self.cls_names:
+
+                    if cls_name not in fewshot_split["classes"]:
+                        raise KeyError(
+                            f"Class '{cls_name}' not found in few-shot split."
+                        )
+
+                    class_split = fewshot_split["classes"][cls_name]
+
+                    if shot_key not in class_split:
+                        raise KeyError(
+                            f"{shot_key}-shot split for '{cls_name}' not found."
+                        )
+
+                    # JSON:
+                    # train/good/083.png
+                    selected_relative_paths = class_split[shot_key]
+
+                    # 当前 AdaptCLIP meta.json 中该类别的训练样本
+                    data_tmp = meta_train_info[cls_name]
+
+                    # 建立 filename -> meta item 映射
+                    #
+                    # meta 中 img_path 可能类似：
+                    # screw/train/good/083.png
+                    data_dict = {
+                        os.path.basename(item["img_path"]): item
+                        for item in data_tmp
+                    }
+
+                    selected_data = []
+
+                    for relative_path in selected_relative_paths:
+                        filename = os.path.basename(relative_path)
+
+                        if filename not in data_dict:
+                            raise RuntimeError(
+                                f"[FewShot Error] class={cls_name}: "
+                                f"{filename} from split JSON "
+                                f"was not found in AdaptCLIP meta.json."
+                            )
+
+                        selected_data.append(data_dict[filename])
+
+                    # 必须严格等于 k-shot
+                    if len(selected_data) != self.k_shots:
+                        raise RuntimeError(
+                            f"[FewShot Error] class={cls_name}, "
+                            f"requested={self.k_shots}, "
+                            f"found={len(selected_data)}"
+                        )
+
+                    self.prompt_data_all.extend(selected_data)
+
+                    print(
+                        f"[FewShot] {cls_name}: {self.k_shots}-shot -> "
+                        + ", ".join(
+                            os.path.basename(item["img_path"])
+                            for item in selected_data
+                        )
+                    )
+
+                    # 保存实际使用的 prompt 图片
+                    with open(prompt_save_dir, "a") as f:
+                        for item in selected_data:
+                            f.write(item["img_path"] + "\n")
+
+            # ==========================================================
+            # 其他数据集暂时保留 AdaptCLIP 官方采样逻辑
+            # 后面做 VisA 时我们再统一改
+            # ==========================================================
+            elif len(self.view_list) > 1:
+
                 for cls_name in self.cls_names:
                     data_tmp = meta_train_info[cls_name]
+
                     for view_id in self.view_list:
                         torch.manual_seed(seed)
-                        data_view_tmp = [item for item in data_tmp if item['view_id'] == view_id]
-                        indices = torch.randint(0, len(data_view_tmp), (self.k_shots,))
-                        self.prompt_data_all.extend([data_view_tmp[i] for i in indices])
+
+                        data_view_tmp = [
+                            item for item in data_tmp
+                            if item['view_id'] == view_id
+                        ]
+
+                        indices = torch.randint(
+                            0,
+                            len(data_view_tmp),
+                            (self.k_shots,)
+                        )
+
+                        self.prompt_data_all.extend(
+                            [data_view_tmp[i] for i in indices]
+                        )
 
                         for i in range(len(indices)):
                             with open(prompt_save_dir, "a") as f:
-                                f.write(data_view_tmp[indices[i]]['img_path'] + '\n')
+                                f.write(
+                                    data_view_tmp[indices[i]]['img_path']
+                                    + '\n'
+                                )
 
             else:
+
                 for cls_name in self.cls_names:
                     data_tmp = meta_train_info[cls_name]
-                    #data_tmp = [item for item in data_tmp if item['anomaly'] == 1] # 排除OK
+
                     torch.manual_seed(seed)
-                    indices = torch.randint(0, len(data_tmp), (self.k_shots,))
-                    self.prompt_data_all.extend([data_tmp[i] for i in indices])
+
+                    indices = torch.randint(
+                        0,
+                        len(data_tmp),
+                        (self.k_shots,)
+                    )
+
+                    self.prompt_data_all.extend(
+                        [data_tmp[i] for i in indices]
+                    )
 
                     for i in range(len(indices)):
                         with open(prompt_save_dir, "a") as f:
-                            f.write(data_tmp[indices[i]]['img_path'] + '\n')
+                            f.write(
+                                data_tmp[indices[i]]['img_path']
+                                + '\n'
+                            )
 
+                self.length = len(self.prompt_data_all)
         self.length = len(self.prompt_data_all)
+                
 
     def __len__(self):
         return self.length

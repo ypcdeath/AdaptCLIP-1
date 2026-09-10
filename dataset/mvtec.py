@@ -11,7 +11,7 @@ class MVTecSolver:
         'tile', 'toothbrush', 'transistor', 'wood', 'zipper',
     ]
 
-    def __init__(self, root='data/mvtec'):
+    def __init__(self, root='/root/autodl-tmp/datasets/MVTec'):
         self.root = root
         self.meta_path = f'{root}/meta.json'
 
@@ -49,5 +49,5 @@ class MVTecSolver:
             f.write(json.dumps(info, indent=4) + "\n")
         print('normal_samples', normal_samples, 'anomaly_samples', anomaly_samples)
 if __name__ == '__main__':
-    runner = MVTecSolver(root='/remote-home/iot_zhouqihang/data/mvdataset')
+    runner = MVTecSolver(root='/root/autodl-tmp/datasets/MVTec')
     runner.run()

@@ -12,7 +12,7 @@ pq_mid_dim=128
 
 # test on VisA dataset, model trained on MVTec dataset
 train_dataset=mvtec
-test_dataset=visa
+test_dataset=mvtec
 for shot in 0 1 2 4
 do
     if [ ${shot} -eq 0 ]; then
@@ -43,7 +43,7 @@ done
 
 
 # test on MVTec dataset, model trained on VisA dataset
-train_dataset=mvtec
+train_dataset=visa
 test_dataset=visa
 for shot in 0 1 2 4
 do
