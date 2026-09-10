@@ -224,8 +224,8 @@ class PromptDataset(data.Dataset):
             prompt_save_dir = os.path.join(save_dir, fs_txt)
 
             # ==========================================================
-            # MVTec: 使用统一固定的 nested few-shot split
-            # PatchCore / AdaptCLIP 共用完全相同的训练图片
+            # VisA fixed few-shot split
+            # PatchCore / AdaptCLIP share same reference images
             # ==========================================================
             if dataset_name == 'mvtec':
 
@@ -317,6 +317,93 @@ class PromptDataset(data.Dataset):
             # 其他数据集暂时保留 AdaptCLIP 官方采样逻辑
             # 后面做 VisA 时我们再统一改
             # ==========================================================
+            elif dataset_name == 'visa':
+
+                split_file = "/root/autodl-tmp/AdaptCLIP/VisA_fewshot_split_seed2026.json"
+
+
+                if not os.path.exists(split_file):
+                    raise FileNotFoundError(
+                        f"Few-shot split file not found: {split_file}"
+                    )
+
+
+                with open(split_file, "r") as f:
+                    fewshot_split = json.load(f)
+
+
+                shot_key = str(self.k_shots)
+
+
+                os.makedirs(save_dir, exist_ok=True)
+
+                # 清空本次prompt记录
+                with open(prompt_save_dir, "w") as f:
+                    pass
+                for cls_name in self.cls_names:
+
+
+                    if cls_name not in fewshot_split["classes"]:
+                        raise KeyError(
+                            f"Class '{cls_name}' not found in few-shot split."
+                        )
+                    class_split = fewshot_split["classes"][cls_name]
+
+                    if shot_key not in class_split:
+                        raise KeyError(
+                            f"{shot_key}-shot split for '{cls_name}' not found."
+                        )
+                    # VisA:
+                    # candle/Data/Images/Normal/0836.JPG
+                    selected_relative_paths = class_split[shot_key]
+
+                    # 当前类别的 meta train 信息
+                    data_tmp = meta_train_info[cls_name]
+
+                    # 用完整路径匹配
+                    data_dict = {
+                        item["img_path"]: item
+                        for item in data_tmp
+                    }
+                    selected_data = []
+                    for relative_path in selected_relative_paths:
+
+                        if relative_path not in data_dict:
+                            raise RuntimeError(
+                                f"[FewShot Error] class={cls_name}: "
+                                f"{relative_path} "
+                                f"was not found in VisA meta.json."
+                            )
+
+                        selected_data.append(
+                            data_dict[relative_path]
+                        )
+
+                    if len(selected_data) != self.k_shots:
+                        raise RuntimeError(
+                            f"[FewShot Error] class={cls_name}, "
+                            f"requested={self.k_shots}, "
+                            f"found={len(selected_data)}"
+                        )
+
+                    self.prompt_data_all.extend(selected_data)
+
+                    print(
+                        f"[FewShot] {cls_name}: "
+                        f"{self.k_shots}-shot -> "
+                        +
+                        ", ".join(
+                            os.path.basename(item["img_path"])
+                            for item in selected_data
+                        )
+                    )
+
+                    with open(prompt_save_dir, "a") as f:
+                        for item in selected_data:
+                            f.write(
+                                item["img_path"]
+                                + "\n"
+                            )
             elif len(self.view_list) > 1:
 
                 for cls_name in self.cls_names:

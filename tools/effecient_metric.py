@@ -75,7 +75,7 @@ class Evaluator:
 
         for metric in self.metrics:
 
-            t0 = time.time()
+            # t0 = time.time()
 
             if metric.startswith('S-AUROC'):
                 eval_results[metric] = self.auroc(pr_s, gt_s).item()
@@ -120,9 +120,9 @@ class Evaluator:
                 ).item()
 
 
-            print(
-                f"{cls_name} {metric}: {time.time()-t0:.2f}s"
-            )
+            # print(
+            #     f"{cls_name} {metric}: {time.time()-t0:.2f}s"
+            # )
 
 
         for m in [

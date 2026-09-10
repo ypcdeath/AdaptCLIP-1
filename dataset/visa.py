@@ -10,7 +10,7 @@ class VisASolver(object):
         'pcb4', 'pipe_fryum',
     ]
 
-    def __init__(self, root='data/visa'):
+    def __init__(self, root='/root/autodl-tmp/datasets/VisA'):
         self.root = root
         self.meta_path = f'{root}/meta.json'
         self.phases = ['train', 'test']
@@ -50,5 +50,5 @@ class VisASolver(object):
 
 
 if __name__ == '__main__':
-    runner = VisASolver(root='/remote-home/iot_zhouqihang/data/Visa')
+    runner = VisASolver(root='/root/autodl-tmp/datasets/VisA')
     runner.run()
