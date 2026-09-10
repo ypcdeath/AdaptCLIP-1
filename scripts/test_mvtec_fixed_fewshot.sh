@@ -13,7 +13,7 @@ model_dir=./adaptclip_checkpoints/${base_dir}
 test_data_path=/root/autodl-tmp/datasets/MVTec
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-for SHOTS in 0 1 2 4 8 16; do
+for SHOTS in 1; do
 
     echo "=== Starting AdaptCLIP Few-Shot Testing: ${SHOTS}-shot ==="
 

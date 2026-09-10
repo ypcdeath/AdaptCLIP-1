@@ -187,7 +187,7 @@ def test(args):
 
 
     # ====================== Initialize Evaluation Metrics ======================
-    cpu_eva = False
+    cpu_eva = True
     if cpu_eva:
         evaluator = Evaluator('cpu', metrics=eval_metrics, sample_level=sample_level)
     else:
@@ -387,7 +387,7 @@ if __name__ == '__main__':
     parser.add_argument("--visual_learner", action="store_true", help="Enable visual adapter")
     parser.add_argument("--textual_learner", action="store_true", help="Enable textual adapter")
     parser.add_argument("--pq_learner", action="store_true", help="Enable prompt-query adapter")
-    parser.add_argument("--eval_metrics", type=str, nargs="+", default=['I-AUROC', 'I-AP', 'I-F1max', 'P-AUROC', 'P-AP', 'P-F1max', 'P-AUPRO'], help='evaluation metrics')
+    parser.add_argument("--eval_metrics", type=str, nargs="+", default=['I-AUROC', 'I-AP', 'I-F1max', 'P-AUROC', 'P-AP', 'P-F1max', 'P-AUPRO'], help='evaluation metrics') # 暂时删除 
     parser.add_argument("--fusion_type", type=str, default="average_mean", help='fusion type')
     parser.add_argument("--vl_reduction", type=int, default=4, help="the reduction number of visual learner")
     parser.add_argument("--pq_mid_dim", type=int, default=128, help="the number of the first hidden layer in pqadapter")

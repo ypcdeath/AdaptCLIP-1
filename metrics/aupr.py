@@ -15,7 +15,7 @@ from torchmetrics.utilities.data import dim_zero_cat
 
 
 class AUPR(BinaryPrecisionRecallCurve):
-    """Area under the PR curve.
+    """Area under the PR curve.`
 
     This metric computes the area under the precision-recall curve.
 
