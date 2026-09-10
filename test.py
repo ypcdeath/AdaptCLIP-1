@@ -187,7 +187,7 @@ def test(args):
 
 
     # ====================== Initialize Evaluation Metrics ======================
-    cpu_eva = True
+    cpu_eva = False
     if cpu_eva:
         evaluator = Evaluator('cpu', metrics=eval_metrics, sample_level=sample_level)
     else:
@@ -336,9 +336,9 @@ def test(args):
     results_eval = {k: np.concatenate(v, axis=0) if k in ['cls_names', 'query_paths', 'sample_ids']  
                     else torch.cat(v, dim=0) for k, v in results_eval.items()}
     # ===== release GPU memory before metrics =====
-    for k, v in results_eval.items():
-        if torch.is_tensor(v):
-            results_eval[k] = v.cpu()
+    # for k, v in results_eval.items():
+    #     if torch.is_tensor(v):
+    #         results_eval[k] = v.cpu()
 
     gc.collect()
     torch.cuda.empty_cache()
