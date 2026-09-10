@@ -12,7 +12,7 @@ base_dir=${n_ctx}_${vl_reduction}_${pq_mid_dim}_train_on_${train_dataset}_3adapt
 model_dir=./adaptclip_checkpoints/${base_dir}
 test_data_path=/root/autodl-tmp/datasets/MVTec
 
-
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 for SHOTS in 0 1 2 4 8 16; do
 
     echo "=== Starting AdaptCLIP Few-Shot Testing: ${SHOTS}-shot ==="
@@ -33,7 +33,7 @@ for SHOTS in 0 1 2 4 8 16; do
         --save_path ${save_dir} \
         --features_list 6 12 18 24 \
         --image_size 518 \
-        --batch_size 8 \
+        --batch_size 4 \
         --n_ctx ${n_ctx} \
         --vl_reduction ${vl_reduction} \
         --pq_mid_dim ${pq_mid_dim} \

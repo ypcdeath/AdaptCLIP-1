@@ -17,6 +17,8 @@ from adaptcliplib import PQAdapter, TextualAdapter, VisualAdapter, fusion_fun
 from dataset import Dataset, PromptDataset
 from tools import Evaluator, get_logger, get_transform, setup_seed, visualizer
 
+import gc
+
 
 def prompt_association(image_memory, patch_memory, target_class_name):
     patch_level_num = len(patch_memory[target_class_name[0]])
@@ -331,7 +333,15 @@ def test(args):
 
     # ====================== Evaluation ======================
     results_eval = dict(sample_ids=sample_ids, gt_masks=gt_masks, pr_masks=pr_masks, cls_names=cls_names, gt_anomalys=gt_anomalys, pr_anomalys=pr_anomalys, query_paths=query_paths)
-    results_eval = {k: np.concatenate(v, axis=0) if k in ['cls_names', 'query_paths', 'sample_ids']  else torch.cat(v, dim=0) for k, v in results_eval.items()}
+    results_eval = {k: np.concatenate(v, axis=0) if k in ['cls_names', 'query_paths', 'sample_ids']  
+                    else torch.cat(v, dim=0) for k, v in results_eval.items()}
+    # ===== release GPU memory before metrics =====
+    for k, v in results_eval.items():
+        if torch.is_tensor(v):
+            results_eval[k] = v.cpu()
+
+    gc.collect()
+    torch.cuda.empty_cache()
 
 
     # save results
