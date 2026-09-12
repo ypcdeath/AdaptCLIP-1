@@ -1,0 +1,203 @@
+{
+  "K": 1,
+  "class_order": [
+    "bottle",
+    "cable",
+    "capsule",
+    "carpet",
+    "grid",
+    "hazelnut",
+    "leather",
+    "metal_nut",
+    "pill",
+    "screw",
+    "tile",
+    "toothbrush",
+    "transistor",
+    "wood",
+    "zipper"
+  ],
+  "classes": {
+    "bottle": [
+      {
+        "anomaly": 0,
+        "cls_name": "bottle",
+        "img_path": "bottle/train/good/001.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "cable": [
+      {
+        "anomaly": 0,
+        "cls_name": "cable",
+        "img_path": "cable/train/good/166.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "capsule": [
+      {
+        "anomaly": 0,
+        "cls_name": "capsule",
+        "img_path": "capsule/train/good/098.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "carpet": [
+      {
+        "anomaly": 0,
+        "cls_name": "carpet",
+        "img_path": "carpet/train/good/190.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "grid": [
+      {
+        "anomaly": 0,
+        "cls_name": "grid",
+        "img_path": "grid/train/good/010.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "hazelnut": [
+      {
+        "anomaly": 0,
+        "cls_name": "hazelnut",
+        "img_path": "hazelnut/train/good/221.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "leather": [
+      {
+        "anomaly": 0,
+        "cls_name": "leather",
+        "img_path": "leather/train/good/205.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "metal_nut": [
+      {
+        "anomaly": 0,
+        "cls_name": "metal_nut",
+        "img_path": "metal_nut/train/good/189.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pill": [
+      {
+        "anomaly": 0,
+        "cls_name": "pill",
+        "img_path": "pill/train/good/177.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "screw": [
+      {
+        "anomaly": 0,
+        "cls_name": "screw",
+        "img_path": "screw/train/good/023.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "tile": [
+      {
+        "anomaly": 0,
+        "cls_name": "tile",
+        "img_path": "tile/train/good/092.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "toothbrush": [
+      {
+        "anomaly": 0,
+        "cls_name": "toothbrush",
+        "img_path": "toothbrush/train/good/002.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "transistor": [
+      {
+        "anomaly": 0,
+        "cls_name": "transistor",
+        "img_path": "transistor/train/good/101.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "wood": [
+      {
+        "anomaly": 0,
+        "cls_name": "wood",
+        "img_path": "wood/train/good/151.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "zipper": [
+      {
+        "anomaly": 0,
+        "cls_name": "zipper",
+        "img_path": "zipper/train/good/011.png",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ]
+  },
+  "dataset": "mvtec",
+  "kind": "reference",
+  "master_sha256": "5b4d73570f401914bdb2b478f09d22c837a3b3dd16824cb614fea2dd47901547",
+  "model_seed": 2026,
+  "provenance": {
+    "generator_python": "3.10.21",
+    "generator_sha256": "dcc2ef94a8a803fac3aa4635adedbd3aa74d24a37faa9edc39a7c295ba01039a",
+    "generator_version": "adaptclip-mvtec-paired-v1",
+    "meta_sha256": "74de13cb824ae5ef403b80031fc18b3955210bd1fcc7c128a9c8a421f0043b4f",
+    "pool_source": "official <class>/train/good/*",
+    "query_source": "official <class>/test/<defect>/*"
+  },
+  "query_sha256": "7d9cc4596a736addda61b574946a60e80b0f27a22bbec1166fb6b649c5775f66",
+  "reference_seed": 10017,
+  "trial": "trial_17",
+  "version": "adaptclip-mvtec-paired-v1"
+}

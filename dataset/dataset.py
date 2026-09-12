@@ -86,13 +86,19 @@ def generate_class_info(dataset_name):
 
 
 class Dataset(data.Dataset):
-    def __init__(self, root, transform, target_transform, dataset_name, k_shots, save_dir, mode='train', seed=10, class_name=None):
+    def __init__(self, root, transform, target_transform, dataset_name, k_shots, save_dir, mode='train', seed=10, class_name=None, query_manifest=None):
         self.root = root
         self.transform = transform
         self.target_transform = target_transform
         self.k_shots = k_shots
         self.mode = mode
         self.save_dir = save_dir
+
+        if query_manifest is not None:
+            from scripts.generate_visa_reference_trials import initialize_dataset
+            self.dataset_name = dataset_name
+            initialize_dataset(self, query_manifest, 'query', seed, class_name)
+            return
 
         meta_info_json = json.load(open(f'{self.root}/meta.json', 'r'))
         meta_test_info = meta_info_json['test']
@@ -185,7 +191,7 @@ class Dataset(data.Dataset):
 
 
 class PromptDataset(data.Dataset):
-    def __init__(self, root, transform, target_transform, dataset_name, k_shots, save_dir, mode='test', seed=10, class_name=None):
+    def __init__(self, root, transform, target_transform, dataset_name, k_shots, save_dir, mode='test', seed=10, class_name=None, reference_manifest=None):
         self.root = root
         self.transform = transform
         self.target_transform = target_transform
@@ -193,6 +199,11 @@ class PromptDataset(data.Dataset):
         self.mode = mode
         self.save_dir = save_dir
         self.dataset_name = dataset_name
+
+        if reference_manifest is not None:
+            from scripts.generate_visa_reference_trials import initialize_dataset
+            initialize_dataset(self, reference_manifest, 'reference', seed, class_name)
+            return
 
         if dataset_name == 'Real-IAD-Variety':
             self.view_list = ['C01', 'C02', 'C03', 'C04', "C05"]

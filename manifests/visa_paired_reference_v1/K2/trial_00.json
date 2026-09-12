@@ -1,0 +1,274 @@
+{
+  "K": 2,
+  "class_order": [
+    "candle",
+    "capsules",
+    "cashew",
+    "chewinggum",
+    "fryum",
+    "macaroni1",
+    "macaroni2",
+    "pcb1",
+    "pcb2",
+    "pcb3",
+    "pcb4",
+    "pipe_fryum"
+  ],
+  "classes": {
+    "candle": [
+      {
+        "anomaly": 0,
+        "cls_name": "candle",
+        "img_path": "candle/Data/Images/Normal/0071.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "candle",
+        "img_path": "candle/Data/Images/Normal/0349.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "capsules": [
+      {
+        "anomaly": 0,
+        "cls_name": "capsules",
+        "img_path": "capsules/Data/Images/Normal/420.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "capsules",
+        "img_path": "capsules/Data/Images/Normal/538.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "cashew": [
+      {
+        "anomaly": 0,
+        "cls_name": "cashew",
+        "img_path": "cashew/Data/Images/Normal/295.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "cashew",
+        "img_path": "cashew/Data/Images/Normal/007.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "chewinggum": [
+      {
+        "anomaly": 0,
+        "cls_name": "chewinggum",
+        "img_path": "chewinggum/Data/Images/Normal/431.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "chewinggum",
+        "img_path": "chewinggum/Data/Images/Normal/205.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "fryum": [
+      {
+        "anomaly": 0,
+        "cls_name": "fryum",
+        "img_path": "fryum/Data/Images/Normal/205.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "fryum",
+        "img_path": "fryum/Data/Images/Normal/102.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "macaroni1": [
+      {
+        "anomaly": 0,
+        "cls_name": "macaroni1",
+        "img_path": "macaroni1/Data/Images/Normal/0179.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "macaroni1",
+        "img_path": "macaroni1/Data/Images/Normal/0073.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "macaroni2": [
+      {
+        "anomaly": 0,
+        "cls_name": "macaroni2",
+        "img_path": "macaroni2/Data/Images/Normal/0717.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "macaroni2",
+        "img_path": "macaroni2/Data/Images/Normal/0734.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pcb1": [
+      {
+        "anomaly": 0,
+        "cls_name": "pcb1",
+        "img_path": "pcb1/Data/Images/Normal/0434.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "pcb1",
+        "img_path": "pcb1/Data/Images/Normal/0251.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pcb2": [
+      {
+        "anomaly": 0,
+        "cls_name": "pcb2",
+        "img_path": "pcb2/Data/Images/Normal/0283.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "pcb2",
+        "img_path": "pcb2/Data/Images/Normal/0976.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pcb3": [
+      {
+        "anomaly": 0,
+        "cls_name": "pcb3",
+        "img_path": "pcb3/Data/Images/Normal/0785.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "pcb3",
+        "img_path": "pcb3/Data/Images/Normal/0874.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pcb4": [
+      {
+        "anomaly": 0,
+        "cls_name": "pcb4",
+        "img_path": "pcb4/Data/Images/Normal/0097.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "pcb4",
+        "img_path": "pcb4/Data/Images/Normal/0478.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ],
+    "pipe_fryum": [
+      {
+        "anomaly": 0,
+        "cls_name": "pipe_fryum",
+        "img_path": "pipe_fryum/Data/Images/Normal/448.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      },
+      {
+        "anomaly": 0,
+        "cls_name": "pipe_fryum",
+        "img_path": "pipe_fryum/Data/Images/Normal/097.JPG",
+        "label": "normal",
+        "mask_path": "",
+        "specie_name": "",
+        "split": "train"
+      }
+    ]
+  },
+  "dataset": "visa",
+  "kind": "reference",
+  "master_sha256": "053a06627632e7f8e208e65531e7c6844a69748acf7a9fee3bb538e6e3d6ce42",
+  "model_seed": 2026,
+  "provenance": {
+    "csv_sha256": "a48557e6033318cb90556f706196bc9d247a776a23ea51aecee5a80dd0332995",
+    "generator_python": "3.10.21",
+    "generator_sha256": "18ba46c4a684ae1d17da9ee3cd0a95ed7a6ef0331d195493620fbcdc9085e744",
+    "generator_version": "adaptclip-visa-paired-v1",
+    "meta_sha256": "238609b36f47d4a87772b90697ebdf43edb6067d81d4893008b02fc5575b8451"
+  },
+  "query_sha256": "2f4c27f6ed4f9aef4d2d9ff09a6a54217cf0abf0bbd343008d781ffd44f60ade",
+  "reference_seed": 10000,
+  "trial": "trial_00",
+  "version": "adaptclip-visa-paired-v1"
+}

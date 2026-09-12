@@ -36,7 +36,7 @@ def prompt_association(image_memory, patch_memory, target_class_name):
     return retrive_image, retrive_patch
 
 
-def build_prompt_memory(model, prompt_dataloader, device, obj_list, view_list, features_list, DPAM_layer):
+def build_prompt_memory(model, prompt_dataloader, device, obj_list, view_list, features_list, DPAM_layer, actual_reference_paths=None):
     """Build few-shot prompt memory."""
     # initialize_memory
     feats_scale_num = len(features_list)
@@ -50,6 +50,10 @@ def build_prompt_memory(model, prompt_dataloader, device, obj_list, view_list, f
 
     for idx, items in enumerate(tqdm(prompt_dataloader)):
         cls_name = items['cls_name']
+        if actual_reference_paths is not None:
+            actual_reference_paths.extend(
+                {'cls_name': c, 'img_path': p} for c, p in zip(cls_name, items['img_path'])
+            )
         prompt_image = items['img'].to(device)  # B*s*c*h*w
         prompt_mask = items['img_mask'].to(device)
         view_id = items['view_id']
@@ -107,6 +111,29 @@ def test(args):
     pq_context = args.pq_context
     eval_metrics =  args.eval_metrics
     mode = 'test'
+    sensitivity = args.reference_manifest is not None or args.query_manifest is not None
+    if sensitivity:
+        import json
+        from pathlib import Path
+        from scripts.generate_visa_reference_trials import check, file_hash, expected_paths, validate_actual
+        from scripts.run_mv_visa_reference_trials import (
+            config_for, write_json, update_metadata, state_fingerprints, save_metrics,
+        )
+        check(args.reference_manifest is not None and args.query_manifest is not None,
+              'Sensitivity requires both reference and query manifests')
+        check(args.k_shots in (1, 2, 4) and args.class_name is None, 'Invalid sensitivity K/class')
+        check(all(getattr(args, key) == value for key, value in config_for(dataset_name).items()), 'Sensitivity config differs')
+        check(torch.cuda.is_available(), 'Sensitivity requires the fixed CUDA evaluation backend')
+        metadata_path = Path(save_path) / 'metadata.json'
+        check(metadata_path.is_file(), 'Use the dedicated sensitivity runner to reserve output/metadata')
+        reserved = json.loads(metadata_path.read_text())
+        check(json.loads((Path(save_path) / 'status.json').read_text()).get('state') == 'running',
+              'Sensitivity output must be freshly reserved by runner')
+        check(not any((Path(save_path) / name).exists() for name in
+                      ('actual_reference_paths.json', 'per_class_metrics.csv', 'overall_metrics.csv')),
+              'Sensitivity artifacts already exist; refusing overwrite')
+        check(file_hash(args.reference_manifest) == reserved['reference_sha256']
+              and file_hash(args.query_manifest) == reserved['query_sha256'], 'Manifest hash differs from run metadata')
 
     log_file = f'{dataset_name}_{seed}seed_{k_shots}shot_{mode}_log.txt'
     logger = get_logger(save_path, log_file)
@@ -126,7 +153,21 @@ def test(args):
         DPAM_layer = 10
 
     preprocess, target_transform = get_transform(image_size=args.image_size)
-    if dataset_name in ['Real-IAD-Variety', 'RealIAD']:
+    if sensitivity:
+        prompt_data = PromptDataset(root=dataset_dir, transform=preprocess, target_transform=target_transform,
+                                    dataset_name=dataset_name, k_shots=k_shots, save_dir=save_path,
+                                    mode=mode, seed=seed, reference_manifest=args.reference_manifest)
+        test_data = Dataset(root=dataset_dir, transform=preprocess, target_transform=target_transform,
+                            dataset_name=dataset_name, k_shots=k_shots, save_dir=save_path,
+                            mode=mode, seed=seed, query_manifest=args.query_manifest)
+        check(prompt_data.identity_manifest['query_sha256'] == file_hash(args.query_manifest),
+              'Reference/query manifest mismatch')
+        reference_paths = expected_paths(prompt_data.identity_manifest, dataset_dir)
+        fixed_query_paths = expected_paths(test_data.identity_manifest, dataset_dir)
+        check(not {r['img_path'] for r in reference_paths} & {r['img_path'] for r in fixed_query_paths},
+              'Reference/query overlap')
+        sample_level = False
+    elif dataset_name in ['Real-IAD-Variety', 'RealIAD']:
         sample_level = True
         prompt_data = PromptDataset(root=dataset_dir, transform=preprocess, target_transform=target_transform, \
                                     dataset_name=dataset_name, k_shots=k_shots, save_dir=save_path, mode=mode, \
@@ -167,6 +208,20 @@ def test(args):
     textual_learner.eval()
     visual_learner.eval()
     pq_learner.eval()
+    if sensitivity:
+        modules = dict(backbone=model, textual=textual_learner, visual=visual_learner, pq=pq_learner)
+        initial_state = state_fingerprints(modules, omit_position=True)
+        update_metadata(save_path, initial_state=initial_state,
+                        position_embedding_note='Original forward performs input-size interpolation; initial hash excludes only visual.positional_embedding',
+                        preprocessing=dict(image=repr(preprocess), mask=repr(target_transform)),
+                        runtime_environment=dict(python=__import__('sys').version, torch=torch.__version__,
+                            cuda=torch.version.cuda, cudnn=torch.backends.cudnn.version(),
+                            device=torch.cuda.get_device_name(0), evaluation_backend='cuda',
+                            dtype=str(next(model.parameters()).dtype),
+                            cudnn_deterministic=torch.backends.cudnn.deterministic,
+                            cudnn_benchmark=torch.backends.cudnn.benchmark,
+                            matmul_tf32=torch.backends.cuda.matmul.allow_tf32,
+                            cudnn_tf32=torch.backends.cudnn.allow_tf32))
 
 
     textual_learner_parameters = sum(p.numel() for p in textual_learner.parameters())
@@ -203,7 +258,19 @@ def test(args):
 
     # ====================== Few-shot Prompt Memory ======================
     if k_shots > 0:
-        prompt_image_memory, prompt_patch_memory = build_prompt_memory(model, prompt_dataloader, device, obj_list, view_list, args.features_list, DPAM_layer)
+        if sensitivity:
+            actual_reference_paths = []
+            prompt_image_memory, prompt_patch_memory = build_prompt_memory(
+                model, prompt_dataloader, device, obj_list, view_list, args.features_list, DPAM_layer,
+                actual_reference_paths=actual_reference_paths)
+            write_json(Path(save_path) / 'actual_reference_paths.json', actual_reference_paths)
+            validate_actual(actual_reference_paths, prompt_data.identity_manifest, dataset_dir)
+            check(initial_state == state_fingerprints(modules, omit_position=True),
+                  'Model changed while building reference memory (beyond original positional interpolation)')
+            inference_state = state_fingerprints(modules)
+            update_metadata(save_path, inference_state=inference_state)
+        else:
+            prompt_image_memory, prompt_patch_memory = build_prompt_memory(model, prompt_dataloader, device, obj_list, view_list, args.features_list, DPAM_layer)
 
 
     # ====================== Visual and Learner forward ======================
@@ -344,10 +411,18 @@ def test(args):
     torch.cuda.empty_cache()
 
 
+    if sensitivity:
+        check(results_eval['query_paths'].tolist() == [r['img_path'] for r in fixed_query_paths],
+              'Actual query paths/order differ from fixed query manifest')
+        update_metadata(save_path, query_paths_verified=True)
+
     # save results
+    raw_metric_rows = [] if sensitivity else None
     msg = {}
     for idx, cls_name in enumerate(tqdm(obj_list)):
         metric_results = evaluator.run(results_eval, cls_name, logger)
+        if sensitivity:
+            raw_metric_rows.append(dict(category=cls_name, **metric_results))
         msg['Name'] = msg.get('Name', [])
         msg['Name'].append(cls_name)
         avg_act = True if len(obj_list) > 1 and idx == len(obj_list) - 1 else False
@@ -365,6 +440,12 @@ def test(args):
 
     tab = tabulate(msg, headers='keys', tablefmt="pipe", floatfmt='.1f', numalign="center", stralign="center", )
     logger.info('\n' + tab)
+    if sensitivity:
+        validate_actual(actual_reference_paths, prompt_data.identity_manifest, dataset_dir)
+        check(inference_state == state_fingerprints(modules), 'Model parameters/buffers changed during query inference')
+        save_metrics(save_path, raw_metric_rows, obj_list)
+        update_metadata(save_path, model_state_verified=True)
+
 
 
 
@@ -393,6 +474,8 @@ if __name__ == '__main__':
     parser.add_argument("--pq_mid_dim", type=int, default=128, help="the number of the first hidden layer in pqadapter")
     parser.add_argument("--pq_context", action="store_true", help="Enable context feature")
     parser.add_argument("--class_name", type=str, help="class name for a special dataset, for example, bottle in MVTec")
+    parser.add_argument('--reference_manifest', type=str, default=None)
+    parser.add_argument('--query_manifest', type=str, default=None)
     args = parser.parse_args()
     print(args)
     setup_seed(args.seed)
